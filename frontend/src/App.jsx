@@ -2,20 +2,60 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
+import axios from "./axiosConfig";
 import RecipesList from "./components/RecipesList";
 import LoginPage from "./components/LoginPage";
 import CustomNavbar from "./components/Navbar";
 import MyRecipes from "./components/MyRecipes";
 
-function App() {
-  const [user, setUser] = useState([]);
-  const [profile, setProfile] = useState([]);
+const App = () => {
+  const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
 
   const login = useGoogleLogin({
-    onSuccess: (response) => setUser(response),
+    onSuccess: async (response) => setUser(response),
     onError: (error) => console.log("Login Failed:", error),
   });
+
+  const saveUserInfo = async (userData) => {
+    try {
+      const res = await axios.post("/login", {
+        google_id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        picture: userData.picture,
+      });
+
+      const { token } = res.data;
+      localStorage.setItem("jwtAccessToken", token);
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
+  };
+
+  // const handleLoginSuccess = async (response) => {
+  //   try {
+  //     console.log("Login Success:", response);
+  //     const res = await axios.post("http://localhost/auth.php", {
+  //       google_id: response.googleId,
+  //       name: response.name,
+  //       email: response.email,
+  //       picture: response.imageUrl,
+  //     });
+
+  //     const { token } = res.data;
+  //     localStorage.setItem("jwtAccessToken", token);
+
+  //     setProfile({
+  //       google_id: response.googleId,
+  //       name: response.name,
+  //       email: response.email,
+  //       picture: response.imageUrl,
+  //     });
+  //   } catch (error) {
+  //     console.error("Error during login:", error);
+  //   }
+  // };
 
   useEffect(() => {
     if (user) {
@@ -30,6 +70,7 @@ function App() {
           }
         )
         .then((res) => {
+          saveUserInfo(res.data);
           setProfile(res.data);
         })
         .catch((err) => console.log(err));
@@ -38,6 +79,7 @@ function App() {
 
   const logOut = () => {
     googleLogout();
+    localStorage.removeItem("jwtAccessToken");
     setProfile(null);
   };
 
@@ -63,6 +105,6 @@ function App() {
       </div>
     </Router>
   );
-}
+};
 
 export default App;
