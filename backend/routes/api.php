@@ -14,7 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/ingredient', [IngredientController::class, 'store']);
 });
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('utensils', [UtensilController::class, 'index']);
-    Route::post('/utensils', [UtensilController::class, 'store']);
+    Route::post('/utensil', [UtensilController::class, 'store']);
 });
