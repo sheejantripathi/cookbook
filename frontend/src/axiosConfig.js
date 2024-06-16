@@ -1,10 +1,16 @@
 import axios from "axios";
-
-const token = localStorage.getItem("token");
-
 axios.defaults.baseURL = "http://localhost:9000/api";
-if (token) {
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-}
+
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("jwtAccessToken");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default axios;
