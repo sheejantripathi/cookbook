@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\UtensilController;
+use App\Http\Controllers\RecipeController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
