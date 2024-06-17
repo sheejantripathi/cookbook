@@ -10,11 +10,19 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('user', [AuthController::class, 'getUser']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    //ingredients api routes
     Route::get('ingredients', [IngredientController::class, 'index']);
     Route::post('/ingredient', [IngredientController::class, 'store']);
-});
 
-Route::middleware('auth:sanctum')->group(function () {
+    //utenils api routes
     Route::get('utensils', [UtensilController::class, 'index']);
     Route::post('/utensil', [UtensilController::class, 'store']);
+
+    //recipes api routes
+    Route::get('recipes', [RecipeController::class, 'index']);
+    Route::post('/recipe', [RecipeController::class, 'store']);
+    Route::get('recipe/{id}', [RecipeController::class, 'show']);
+    Route::put('recipe/{id}', [RecipeController::class, 'update']);
+    Route::delete('recipe/{id}', [RecipeController::class, 'destroy']);
 });
+

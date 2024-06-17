@@ -13,6 +13,11 @@ class Recipe extends Model
 
     protected $fillable = ['name', 'description', 'image', 'steps', 'user_id'];
 
+    //Attribute casting
+    protected $casts = [
+        'steps' => 'array',
+    ];
+
     //relationships
     public function ingredients() {
         return $this->belongsToMany(Ingredient::class);
