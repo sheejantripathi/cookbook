@@ -7,6 +7,7 @@ import RecipesList from "./components/RecipesList";
 import LoginPage from "./components/LoginPage";
 import CustomNavbar from "./components/Navbar";
 import MyRecipes from "./components/MyRecipes";
+import RecipeForm from "./components/RecipeForm";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -94,6 +95,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<RecipesList />} />
                 <Route path="/my-recipes" element={<MyRecipes />} />
+                <Route path="/add-recipe" element={<RecipeForm />} />
               </Routes>
             </div>
           </>

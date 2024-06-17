@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\Auth;
+
 
 class RecipeController extends Controller
 {
@@ -26,55 +25,43 @@ class RecipeController extends Controller
     public function store(Request $request)
     {
         try {
-           
-        Log::info('This is incoming request', $request->all());
-        // Validate the request data
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|string',
-            'steps' => 'nullable|array',
-            'steps.*' => 'string',
-            'ingredients' => 'nullable|array',
-            'utensils' => 'nullable|array',
-        ]);
+            // Validate the request data
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Updated validation for image upload
+                'steps' => 'required|array',
+                'steps.*' => 'required|string',
+                'ingredients' => 'required|array',
+                'ingredients.*' => 'exists:ingredients,id',
+                'utensils' => 'required|array',
+                'utensils.*' => 'exists:utensils,id',
+            ]);
 
-        if ($validator->fails()) {
+            $data = $request->all();
+            $data['user_id'] = Auth::id();
+
+            // Handle file upload
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('images', 'public'); // Store file in 'storage/app/public/images' directory
+                $data['image'] = asset('storage/' . $imagePath); // Store the public URL of the uploaded file
+            }
+
+            $recipe = Recipe::create($data);
+
+            // Sync ingredients and utensils
+            $recipe->ingredients()->sync($request->ingredients);
+            $recipe->utensils()->sync($request->utensils);
+
             return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $recipe = Recipe::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'image' => $request->image,
-            'steps' => $request->steps,
-            'user_id' => auth()->user()->id
-        
-        ]);
-        // $recipe->ingredients()->attach($validatedData['ingredients']);
-        // $recipe->utensils()->attach($validatedData['utensils']);
-
-        if ($request->has('ingredients')) {
-            $recipe->ingredients()->attach($request->ingredients);
-        }
-
-        if ($request->has('utensils')) {
-            $recipe->utensils()->attach($request->utensils);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => $recipe
-        ], 201);
+                'status' => 'success',
+                'data' => $recipe
+            ], 201);
         
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'An error occured while saving the recipe',
+                'message' => 'An error occurred while saving the recipe',
                 'error' => $e->getMessage()
             ], 500);
         }
