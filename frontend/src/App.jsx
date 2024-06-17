@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { googleLogout, useGoogleLogin } from "@react-oauth/google";
-import axios from "./axiosConfig";
+import axios from "./axiosConfig"; // Assuming axiosConfig.js is correctly configured
 import RecipesList from "./components/RecipesList";
 import LoginPage from "./components/LoginPage";
 import CustomNavbar from "./components/Navbar";
@@ -28,35 +28,33 @@ const App = () => {
 
       const { token } = res.data;
       localStorage.setItem("jwtAccessToken", token);
+      setProfile(userData); // Set profile immediately after getting token
     } catch (error) {
       console.error("Error during login:", error);
     }
   };
 
-  // const handleLoginSuccess = async (response) => {
-  //   try {
-  //     console.log("Login Success:", response);
-  //     const res = await axios.post("http://localhost/auth.php", {
-  //       google_id: response.googleId,
-  //       name: response.name,
-  //       email: response.email,
-  //       picture: response.imageUrl,
-  //     });
+  // Check for JWT token in localStorage on app load (page refresh)
+  useEffect(() => {
+    const token = localStorage.getItem("jwtAccessToken");
+    if (token) {
+      axios
+        .get("/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setProfile(res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching profile", err);
+          localStorage.removeItem("jwtAccessToken"); // Remove invalid token
+        });
+    }
+  }, []);
 
-  //     const { token } = res.data;
-  //     localStorage.setItem("jwtAccessToken", token);
-
-  //     setProfile({
-  //       google_id: response.googleId,
-  //       name: response.name,
-  //       email: response.email,
-  //       picture: response.imageUrl,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error during login:", error);
-  //   }
-  // };
-
+  // Handle Google OAuth login and save user info
   useEffect(() => {
     if (user) {
       axios
