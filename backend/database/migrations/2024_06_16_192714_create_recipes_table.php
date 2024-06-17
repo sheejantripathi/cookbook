@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('image');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
-
+            $table->json('steps')->nullable(); // Use json type for steps
             // Foreign key constraint
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
