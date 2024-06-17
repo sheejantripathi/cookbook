@@ -1,7 +1,9 @@
 // MyRecipes.js
 import React, { useState } from "react";
 import { Table, Button } from "react-bootstrap";
-import RecipeModal from "./RecipeModal";
+import { Link } from "react-router-dom";
+
+import RecipeModal from "./RecipeForm";
 
 const MyRecipes = () => {
   const [recipes, setRecipes] = useState([
@@ -45,9 +47,9 @@ const MyRecipes = () => {
   return (
     <div className="container mt-5">
       <h2 className="mb-4">My Recipes</h2>
-      <Button variant="primary" onClick={handleAddRecipe}>
-        Add Recipe
-      </Button>
+      <Link to="/add-recipe">
+        <Button variant="primary">Add Recipe</Button>
+      </Link>
       <Table striped bordered hover className="mt-3">
         <thead>
           <tr>
