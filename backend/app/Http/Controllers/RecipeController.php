@@ -15,18 +15,62 @@ class RecipeController extends Controller
      */
     public function index(Request $request)
     {
-        // get user id from the query parameter
-        $userId = $request->query('userId');
+         // get user id from the query parameter
+         $userId = $request->query('userId');
 
-        if ($userId) {
-            // Get recipes by user id
-            $recipes = Recipe::with(['ingredients', 'utensils', 'user'])
-                        ->where('user_id', $userId)
-                        ->get();
-        } else {
-            // Get all recipes if no user id is provided
-            $recipes = Recipe::with(['ingredients', 'utensils', 'user'])->get();
+         if ($userId) {
+             // Get recipes by user id
+             $recipes = Recipe::with(['ingredients', 'utensils', 'user'])
+                         ->where('user_id', $userId)
+                         ->get();
+         } else {
+             // Get all recipes if no user id is provided
+             $recipes = Recipe::with(['ingredients', 'utensils', 'user'])->get();
+         }
+ 
+         // Transform the recipes to send only ingredient names and utensil names
+         $transformedRecipes = $recipes->map(function ($recipe) {
+             return [
+                 'id' => $recipe->id,
+                 'name' => $recipe->name,
+                 'description' => $recipe->description,
+                 'image' => $recipe->image,
+                 'ingredients' => $recipe->ingredients->pluck('name')->toArray(),
+                 'utensils' => $recipe->utensils->pluck('name')->toArray(),
+                 'user' => $recipe->user->id,
+                 'steps' => $recipe->steps,
+                 // You can include other fields as needed
+             ];
+         });
+ 
+         return response()->json($transformedRecipes);
+ 
+    }
+
+    /**
+     * Display all the recipes in the homepage
+     */
+
+     public function homePage(Request $request)
+    {
+         // Get query parameters
+        $page = $request->query('page') ?? 1;
+        $limit = $request->query('limit') ?? 2;
+        $ingredientIds = $request->query('ingredients');
+
+        //build the complete query
+        $query = Recipe::with(['ingredients', 'utensils', 'user'])->orderBy('created_at', 'desc');
+
+        // Filter by ingredients if needed or provided in the query
+        if ($ingredientIds) {
+            $ingredientIdsArray = explode(',', $ingredientIds);
+            $query->whereHas('ingredients', function ($q) use ($ingredientIdsArray) {
+                $q->whereIn('id', $ingredientIdsArray);
+            });
         }
+
+        // pagination for the query results
+        $recipes = $query->paginate($limit, ['*'], 'page', $page);
 
         // Transform the recipes to send only ingredient names and utensil names
         $transformedRecipes = $recipes->map(function ($recipe) {
@@ -39,11 +83,16 @@ class RecipeController extends Controller
                 'utensils' => $recipe->utensils->pluck('name')->toArray(),
                 'user' => $recipe->user->id,
                 'steps' => $recipe->steps,
-                // You can include other fields as needed
             ];
         });
 
-        return response()->json($transformedRecipes);
+        return response()->json([
+            'data' => $transformedRecipes,
+            'current_page' => $recipes->currentPage(),
+            'total' => $recipes->total(),
+            'per_page' => $recipes->perPage(),
+            'last_page' => $recipes->lastPage(),
+        ]);
     }
 
     /**
@@ -136,26 +185,24 @@ class RecipeController extends Controller
         'ingredients.*' => 'exists:ingredients,id',
         'utensils' => 'required|array',
         'utensils.*' => 'exists:utensils,id',
-        'image' => 'string|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
     ]);
 
-    // Handle image upload if a new image is provided
-    if ($request->hasFile('image')) {
-        $image = $request->file('image');
-        $imageName = time().'.'.$image->getClientOriginalExtension();
-        $image->move(public_path('images'), $imageName);
-        $recipe->image = '/images/'.$imageName;
+   
+    // Update basic fields
+    $data = $request->all();
+    $data['user_id'] = Auth::id();
+  
+    Log::info($data);
+    
+     // Handle image upload if a new image is provided
+     if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('images', 'public'); // Store file in 'storage/app/public/images' directory
+        $data['image'] = asset('storage/' . $imagePath); // Store the public URL of the uploaded file
     }else{
         $recipe->image = $request->input('imageString');
     }
 
-    // Update basic fields
-    $data = $request->all();
-    $data['user_id'] = Auth::id();
-    Log::info($data);
-    // $recipe->name = $request->input('name');
-    // $recipe->description = $request->input('description');
-    // $recipe->steps = $request->input('steps');
     $recipe->fill($data);
     $recipe->save();
 
