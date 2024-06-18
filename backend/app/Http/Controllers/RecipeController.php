@@ -6,17 +6,44 @@ use App\Http\Controllers\Controller;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Log;
 
 class RecipeController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $recipes = Recipe::with(['ingredients', 'utensils', 'user'])->get();
-        return response()->json($recipes);
+        // get user id from the query parameter
+        $userId = $request->query('userId');
+
+        if ($userId) {
+            // Get recipes by user id
+            $recipes = Recipe::with(['ingredients', 'utensils', 'user'])
+                        ->where('user_id', $userId)
+                        ->get();
+        } else {
+            // Get all recipes if no user id is provided
+            $recipes = Recipe::with(['ingredients', 'utensils', 'user'])->get();
+        }
+
+        // Transform the recipes to send only ingredient names and utensil names
+        $transformedRecipes = $recipes->map(function ($recipe) {
+            return [
+                'id' => $recipe->id,
+                'name' => $recipe->name,
+                'description' => $recipe->description,
+                'image' => $recipe->image,
+                'ingredients' => $recipe->ingredients->pluck('name')->toArray(),
+                'utensils' => $recipe->utensils->pluck('name')->toArray(),
+                'user' => $recipe->user->id,
+                'steps' => $recipe->steps,
+                // You can include other fields as needed
+            ];
+        });
+
+        return response()->json($transformedRecipes);
     }
 
     /**
@@ -93,25 +120,56 @@ class RecipeController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        $recipe = Recipe::find($id);
-
-        if (!$recipe) {
-            return response()->json(['error' => 'Recipe not found'], 404);
-        }
-    
-        $recipe->update($request->all());
-    
-        if ($request->has('ingredients')) {
-            $recipe->ingredients()->sync($request->input('ingredients'));
-        }
-    
-        if ($request->has('utensils')) {
-            $recipe->utensils()->sync($request->input('utensils'));
-        }
-    
-        return response()->json($recipe);
+{
+    $recipe = Recipe::find($id);
+    if (!$recipe) {
+        return response()->json(['error' => 'Recipe not found'], 404);
     }
+
+    // Validate the request data
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        'steps' => 'required|array',
+        'steps.*' => 'string',
+        'ingredients' => 'required|array',
+        'ingredients.*' => 'exists:ingredients,id',
+        'utensils' => 'required|array',
+        'utensils.*' => 'exists:utensils,id',
+        'image' => 'string|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+    ]);
+
+    // Handle image upload if a new image is provided
+    if ($request->hasFile('image')) {
+        $image = $request->file('image');
+        $imageName = time().'.'.$image->getClientOriginalExtension();
+        $image->move(public_path('images'), $imageName);
+        $recipe->image = '/images/'.$imageName;
+    }else{
+        $recipe->image = $request->input('imageString');
+    }
+
+    // Update basic fields
+    $data = $request->all();
+    $data['user_id'] = Auth::id();
+    Log::info($data);
+    // $recipe->name = $request->input('name');
+    // $recipe->description = $request->input('description');
+    // $recipe->steps = $request->input('steps');
+    $recipe->fill($data);
+    $recipe->save();
+
+    // Sync the relationships
+    if ($request->has('ingredients')) {
+        $recipe->ingredients()->sync($request->input('ingredients'));
+    }
+
+    if ($request->has('utensils')) {
+        $recipe->utensils()->sync($request->input('utensils'));
+    }
+
+    return response()->json($recipe);
+}
 
     /**
      * Remove the specified resource from storage.

@@ -94,8 +94,12 @@ const App = () => {
               </h1>
               <Routes>
                 <Route path="/" element={<RecipesList />} />
-                <Route path="/my-recipes" element={<MyRecipes />} />
+                <Route
+                  path="/my-recipes"
+                  element={<MyRecipes userId={profile.id} />}
+                />
                 <Route path="/add-recipe" element={<RecipeForm />} />
+                <Route path="/edit-recipe/:id" element={<RecipeForm />} />
               </Routes>
             </div>
           </>

@@ -1,47 +1,36 @@
-// MyRecipes.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-import RecipeModal from "./RecipeForm";
+// eslint-disable-next-line react/prop-types
+const MyRecipes = ({ userId }) => {
+  const [recipes, setRecipes] = useState([]);
+  const navigate = useNavigate();
 
-const MyRecipes = () => {
-  const [recipes, setRecipes] = useState([
-    {
-      id: 1,
-      name: "Spaghetti Bolognese",
-      ingredients: "Spaghetti, minced beef, tomato sauce",
-      utensils: "Pot, pan, spoon",
-      steps: "1. Cook spaghetti. 2. Prepare sauce. 3. Mix and serve.",
-    },
-    // Add more dummy recipes if needed
-  ]);
+  useEffect(() => {
+    const fetchRecipes = async () => {
+      try {
+        const response = await axios.get(`/recipes?userId=${userId}`);
+        setRecipes(response.data);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+      }
+    };
+    fetchRecipes();
+  }, [userId]);
 
-  const [showModal, setShowModal] = useState(false);
-  const [currentRecipe, setCurrentRecipe] = useState(null);
-
-  const handleAddRecipe = () => {
-    setCurrentRecipe(null);
-    setShowModal(true);
-  };
-
-  const handleEditRecipe = (recipe) => {
-    setCurrentRecipe(recipe);
-    setShowModal(true);
-  };
-
-  const handleDeleteRecipe = (recipeId) => {
-    setRecipes(recipes.filter((recipe) => recipe.id !== recipeId));
-  };
-
-  const handleSaveRecipe = (recipe) => {
-    if (recipe.id) {
-      setRecipes(recipes.map((r) => (r.id === recipe.id ? recipe : r)));
-    } else {
-      recipe.id = recipes.length + 1;
-      setRecipes([...recipes, recipe]);
+  const handleDeleteRecipe = async (recipeId) => {
+    try {
+      await axios.delete(`/recipe/${recipeId}`);
+      setRecipes(recipes.filter((recipe) => recipe.id !== recipeId));
+    } catch (error) {
+      console.error("Error deleting recipe:", error);
     }
-    setShowModal(false);
+  };
+
+  const handleEdit = (recipeId) => {
+    navigate(`/edit-recipe/${recipeId}`);
   };
 
   return (
@@ -61,38 +50,39 @@ const MyRecipes = () => {
           </tr>
         </thead>
         <tbody>
-          {recipes.map((recipe) => (
-            <tr key={recipe.id}>
-              <td>{recipe.name}</td>
-              <td>{recipe.ingredients}</td>
-              <td>{recipe.utensils}</td>
-              <td>{recipe.steps}</td>
-              <td>
-                <Button
-                  variant="warning"
-                  onClick={() => handleEditRecipe(recipe)}
-                  className="me-2"
-                >
-                  Edit
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={() => handleDeleteRecipe(recipe.id)}
-                >
-                  Delete
-                </Button>
+          {recipes.length > 0 ? (
+            recipes.map((recipe) => (
+              <tr key={recipe.id}>
+                <td>{recipe.name}</td>
+                <td>{recipe.ingredients.join(", ")}</td>
+                <td>{recipe.utensils.join(", ")}</td>
+                <td>{recipe.steps.join(", ").substr(0, 50) + "..."}</td>
+                <td>
+                  <Button
+                    variant="warning"
+                    className="me-2"
+                    onClick={() => handleEdit(recipe.id)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleDeleteRecipe(recipe.id)}
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="5" className="text-center">
+                No recipes found
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
-
-      <RecipeModal
-        show={showModal}
-        handleClose={() => setShowModal(false)}
-        handleSave={handleSaveRecipe}
-        recipe={currentRecipe}
-      />
     </div>
   );
 };
