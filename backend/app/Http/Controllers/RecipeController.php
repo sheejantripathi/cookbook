@@ -55,17 +55,16 @@ class RecipeController extends Controller
     {
          // Get query parameters
         $page = $request->query('page') ?? 1;
-        $limit = $request->query('limit') ?? 2;
-        $ingredientIds = $request->query('ingredients');
+        $limit = $request->query('limit') ?? 8;
+        $ingredient = $request->query('ingredient');
 
         //build the complete query
         $query = Recipe::with(['ingredients', 'utensils', 'user'])->orderBy('created_at', 'desc');
 
         // Filter by ingredients if needed or provided in the query
-        if ($ingredientIds) {
-            $ingredientIdsArray = explode(',', $ingredientIds);
-            $query->whereHas('ingredients', function ($q) use ($ingredientIdsArray) {
-                $q->whereIn('id', $ingredientIdsArray);
+        if ($ingredient) {
+            $query->whereHas('ingredients', function($q) use ($ingredient) {
+                $q->where('name', 'like', '%' . $ingredient . '%');
             });
         }
 
@@ -73,7 +72,7 @@ class RecipeController extends Controller
         $recipes = $query->paginate($limit, ['*'], 'page', $page);
 
         // Transform the recipes to send only ingredient names and utensil names
-        $transformedRecipes = $recipes->map(function ($recipe) {
+        $transformedRecipes = $recipes->getCollection()->map(function ($recipe) {
             return [
                 'id' => $recipe->id,
                 'name' => $recipe->name,
