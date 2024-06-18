@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Image } from "react-bootstrap";
 import axios from "../axiosConfig";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 
 const RecipeForm = () => {
+  const { id } = useParams();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
@@ -17,6 +18,28 @@ const RecipeForm = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (id) {
+      axios.get(`/recipe/${id}`).then((response) => {
+        const recipe = response.data;
+        setName(recipe.name);
+        setDescription(recipe.description);
+        setImagePreview(recipe.image);
+        setSteps(recipe.steps);
+        setSelectedIngredients(
+          recipe.ingredients.map((ingredient) => ({
+            value: ingredient.id,
+            label: ingredient.name,
+          }))
+        );
+        setSelectedUtensils(
+          recipe.utensils.map((utensil) => ({
+            value: utensil.id,
+            label: utensil.name,
+          }))
+        );
+      });
+    }
+
     axios
       .get("/ingredients")
       .then((response) => {
@@ -38,7 +61,7 @@ const RecipeForm = () => {
         setUtensilOptions(options);
       })
       .catch((error) => console.error("Error fetching utensils:", error));
-  }, []);
+  }, [id]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -86,33 +109,57 @@ const RecipeForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
+
     formData.append("name", name);
     formData.append("description", description);
-    formData.append("image", image);
+    if (image) {
+      formData.append("image", image);
+    } else {
+      formData.append("imageString", imagePreview); // Ensure image is not null
+    }
     steps.forEach((step) => {
-      formData.append(`steps[]`, step); // Append as array
+      formData.append("steps[]", step); // Append as array
     });
 
     selectedIngredients.forEach((ingredient) => {
-      formData.append(`ingredients[]`, ingredient.value); // Append as array
+      formData.append("ingredients[]", ingredient.value); // Append as array
     });
 
     selectedUtensils.forEach((utensil) => {
-      formData.append(`utensils[]`, utensil.value); // Append as array
+      formData.append("utensils[]", utensil.value); // Append as array
     });
 
-    // Logging the FormData object for debugging
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
     try {
-      await axios.post("/recipe", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
-        },
-      });
+      if (id) {
+        try {
+          await axios.post(`/recipe/${id}`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
+            },
+          });
+          // Handle successful update
+        } catch (error) {
+          if (
+            error.response &&
+            error.response.data &&
+            error.response.data.errors
+          ) {
+            // Handle validation errors
+            console.log(error.response.data.errors);
+          } else {
+            // Handle other errors
+            console.error("Update failed:", error.message);
+          }
+        }
+      } else {
+        await axios.post("/recipe", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
+          },
+        });
+      }
       navigate("/my-recipes");
     } catch (error) {
       console.error("There was an error submitting the form!", error);
@@ -121,7 +168,7 @@ const RecipeForm = () => {
 
   return (
     <div className="container">
-      <h1>Add a New Recipe</h1>
+      <h1>{id ? "Edit Recipe" : "Add a New Recipe"}</h1>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
           <Form.Label htmlFor="name">Name</Form.Label>
@@ -154,7 +201,6 @@ const RecipeForm = () => {
                 id="image"
                 type="file"
                 onChange={handleImageChange}
-                required
                 className="form-control-sm"
               />
             </Col>
@@ -227,7 +273,7 @@ const RecipeForm = () => {
           />
         </Form.Group>
         <Button variant="primary" type="submit">
-          Submit
+          {id ? "Update" : "Submit"}
         </Button>
       </Form>
     </div>
