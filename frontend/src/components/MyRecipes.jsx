@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import axios from "axios";
-
 // eslint-disable-next-line react/prop-types
 const MyRecipes = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -30,7 +28,7 @@ const MyRecipes = ({ userId }) => {
   };
 
   const handleEdit = (recipeId) => {
-    navigate(`/edit-recipe/${recipeId}`);
+    Navigate(`/edit-recipe/${recipeId}`);
   };
 
   return (
@@ -43,6 +41,7 @@ const MyRecipes = ({ userId }) => {
         <thead>
           <tr>
             <th>Name</th>
+            <th>Image</th>
             <th>Ingredients</th>
             <th>Utensils</th>
             <th>Steps</th>
@@ -54,23 +53,36 @@ const MyRecipes = ({ userId }) => {
             recipes.map((recipe) => (
               <tr key={recipe.id}>
                 <td>{recipe.name}</td>
+                <td>
+                  {recipe.image ? (
+                    <img
+                      src={recipe.image}
+                      alt="Recipe"
+                      style={{ width: "100px", height: "100px" }}
+                    />
+                  ) : (
+                    <p>No image available</p>
+                  )}
+                </td>
                 <td>{recipe.ingredients.join(", ")}</td>
                 <td>{recipe.utensils.join(", ")}</td>
-                <td>{recipe.steps.join(", ").substr(0, 50) + "..."}</td>
+                <td>{recipe.steps.join(", ").substr(0, 100) + "..."}</td>
                 <td>
-                  <Button
-                    variant="warning"
-                    className="me-2"
-                    onClick={() => handleEdit(recipe.id)}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() => handleDeleteRecipe(recipe.id)}
-                  >
-                    Delete
-                  </Button>
+                  <div className="d-flex justify-content-between">
+                    <Button
+                      variant="warning"
+                      className="me-2"
+                      onClick={() => handleEdit(recipe.id)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={() => handleDeleteRecipe(recipe.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))

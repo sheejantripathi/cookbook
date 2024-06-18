@@ -37,12 +37,11 @@ const App = () => {
 
   // Check for JWT token in localStorage on app load (page refresh)
   useEffect(() => {
-    const token = localStorage.getItem("jwtAccessToken");
-    if (token) {
+    if (localStorage.getItem("jwtAccessToken")) {
       axios
         .get("/user", {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
           },
         })
         .then((res) => {
@@ -110,5 +109,4 @@ const App = () => {
     </Router>
   );
 };
-
 export default App;
