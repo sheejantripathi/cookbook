@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Image } from "react-bootstrap";
-import axios from "../axiosConfig";
+import axios from "../axiosConfig"; // Assuming axiosConfig.js is correctly configured
 import { useNavigate, useParams } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 
@@ -19,29 +19,39 @@ const RecipeForm = () => {
 
   useEffect(() => {
     if (id) {
-      axios.get(`/recipe/${id}`).then((response) => {
-        const recipe = response.data;
-        setName(recipe.name);
-        setDescription(recipe.description);
-        setImagePreview(recipe.image);
-        setSteps(recipe.steps);
-        setSelectedIngredients(
-          recipe.ingredients.map((ingredient) => ({
-            value: ingredient.id,
-            label: ingredient.name,
-          }))
-        );
-        setSelectedUtensils(
-          recipe.utensils.map((utensil) => ({
-            value: utensil.id,
-            label: utensil.name,
-          }))
-        );
-      });
+      axios
+        .get(`/recipe/${id}`, {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        })
+        .then((response) => {
+          const recipe = response.data;
+          setName(recipe.name);
+          setDescription(recipe.description);
+          setImagePreview(recipe.image);
+          setSteps(recipe.steps);
+          setSelectedIngredients(
+            recipe.ingredients.map((ingredient) => ({
+              value: ingredient.id,
+              label: ingredient.name,
+            }))
+          );
+          setSelectedUtensils(
+            recipe.utensils.map((utensil) => ({
+              value: utensil.id,
+              label: utensil.name,
+            }))
+          );
+        });
     }
 
     axios
-      .get("/ingredients")
+      .get("/ingredients", {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      })
       .then((response) => {
         const options = response.data.map((ingredient) => ({
           value: ingredient.id,
@@ -52,7 +62,11 @@ const RecipeForm = () => {
       .catch((error) => console.error("Error fetching ingredients:", error));
 
     axios
-      .get("/utensils")
+      .get("/utensils", {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      })
       .then((response) => {
         const options = response.data.map((utensil) => ({
           value: utensil.id,
@@ -86,7 +100,15 @@ const RecipeForm = () => {
 
   const handleCreateIngredient = async (inputValue) => {
     try {
-      const response = await axios.post("/ingredient", { name: inputValue });
+      const response = await axios.post(
+        "/ingredient",
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        },
+        { name: inputValue }
+      );
       const newOption = { value: response.data.id, label: response.data.name };
       setIngredientOptions((prevOptions) => [...prevOptions, newOption]);
       setSelectedIngredients((prevSelected) => [...prevSelected, newOption]);
@@ -97,7 +119,15 @@ const RecipeForm = () => {
 
   const handleCreateUtensil = async (inputValue) => {
     try {
-      const response = await axios.post("/utensil", { name: inputValue });
+      const response = await axios.post(
+        "/utensil",
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        },
+        { name: inputValue }
+      );
       const newOption = { value: response.data.id, label: response.data.name };
       setUtensilOptions((prevOptions) => [...prevOptions, newOption]);
       setSelectedUtensils((prevSelected) => [...prevSelected, newOption]);

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // CustomNavbar.js
 import React from "react";
 import {
@@ -9,7 +10,7 @@ import {
   NavDropdown,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import PropTypes from "prop-types";
+// import PropTypes from "prop-types";
 
 const CustomNavbar = ({ profile, logOut }) => {
   return (
@@ -56,13 +57,13 @@ const CustomNavbar = ({ profile, logOut }) => {
   );
 };
 
-CustomNavbar.propTypes = {
-  profile: PropTypes.shape({
-    picture: PropTypes.string,
-    name: PropTypes.string,
-    email: PropTypes.string,
-  }),
-  logOut: PropTypes.func.isRequired,
-};
+// CustomNavbar.propTypes = {
+//   profile: PropTypes.shape({
+//     picture: PropTypes.string,
+//     name: PropTypes.string,
+//     email: PropTypes.string,
+//   }),
+//   logOut: PropTypes.func.isRequired,
+// };
 
 export default CustomNavbar;

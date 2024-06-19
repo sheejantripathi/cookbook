@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = "http://localhost:8000/api";
+axios.defaults.baseURL = "https://db04-89-205-227-35.ngrok-free.app/api";
 
 axios.interceptors.request.use(
   (config) => {
@@ -7,6 +7,9 @@ axios.interceptors.request.use(
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
+
+    // Add your headers here
+    axios.defaults.headers.common["Accept"] = "application/json";
 
     return config;
   },

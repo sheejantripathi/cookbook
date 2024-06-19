@@ -8,7 +8,7 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
-import axios from "axios";
+import axios from "../axiosConfig"; // Assuming axiosConfig.js is correctly configured
 
 const Recipes = () => {
   //state management of the recipes and the current page
@@ -24,9 +24,22 @@ const Recipes = () => {
 
   const fetchRecipes = async (page, query) => {
     try {
+      // const response = await axios.get({
+      //   url: `https://55d1-89-205-227-35.ngrok-free.app/api/recipes/all?page=${1}&ingredient=${query}`,
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // });
       const response = await axios.get(
-        `/recipes/all?page=${page}&ingredient=${query}`
+        `/recipes/all?page=${page}&ingredient=${query}`,
+        {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
       );
+      console.log("recipe data for the frontened", response);
       setRecipes(response.data.data);
       setCurrentPage(response.data.current_page);
       setLastPage(response.data.last_page);
@@ -51,7 +64,7 @@ const Recipes = () => {
           <h1 className="text-center">Recipes</h1>
         </Col>
         <Col md="auto" className="ml-auto">
-          <Form inline onSubmit={handleSearch}>
+          <Form inline="true" onSubmit={handleSearch}>
             <Form.Control
               type="text"
               placeholder="Search by ingredient"
@@ -66,20 +79,21 @@ const Recipes = () => {
         </Col>
       </Row>
       <Row>
-        {recipes.map((recipe) => (
-          <Col key={recipe.id} sm={12} md={6} lg={4} xl={3} className="mb-4">
-            <Card>
-              <Card.Img
-                variant="top"
-                src={recipe.image || "default_image.jpg"}
-                alt={recipe.name}
-              />
-              <Card.Body>
-                <Card.Title>{recipe.name}</Card.Title>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
+        {recipes &&
+          recipes.map((recipe) => (
+            <Col key={recipe.id} sm={12} md={6} lg={4} xl={3} className="mb-4">
+              <Card>
+                <Card.Img
+                  variant="top"
+                  src={recipe.image || "default_image.jpg"}
+                  alt={recipe.name}
+                />
+                <Card.Body>
+                  <Card.Title>{recipe.name}</Card.Title>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
       </Row>
       <Pagination className="justify-content-center">
         {Array.from({ length: lastPage }, (_, index) => (

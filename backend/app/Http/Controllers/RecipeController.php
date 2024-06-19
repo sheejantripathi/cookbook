@@ -84,7 +84,7 @@ class RecipeController extends Controller
                 'steps' => $recipe->steps,
             ];
         });
-
+        
         return response()->json([
             'data' => $transformedRecipes,
             'current_page' => $recipes->currentPage(),

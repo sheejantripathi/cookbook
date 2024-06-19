@@ -14,11 +14,11 @@ Route::middleware('auth:sanctum')->group(function () {
     //ingredients api routes
     Route::get('ingredients', [IngredientController::class, 'index']);
     Route::post('/ingredient', [IngredientController::class, 'store']);
-
+    
     //utenils api routes
     Route::get('utensils', [UtensilController::class, 'index']);
     Route::post('/utensil', [UtensilController::class, 'store']);
-
+    
     //recipes api routes
     Route::get('recipes', [RecipeController::class, 'index']);
     Route::get('recipes/all', [RecipeController::class, 'homepage']);
@@ -26,5 +26,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recipe/{id}', [RecipeController::class, 'show']);
     Route::post('/recipe/{id}', [RecipeController::class, 'update']);
     Route::delete('/recipe/{id}', [RecipeController::class, 'destroy']);
+    
 });
 

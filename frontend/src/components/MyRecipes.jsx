@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
 import { Link, Navigate } from "react-router-dom";
-import axios from "axios";
+import axios from "../axiosConfig"; // Assuming axiosConfig.js is correctly configured
 // eslint-disable-next-line react/prop-types
 const MyRecipes = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
-
+  console.log(userId);
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
-        const response = await axios.get(`/recipes?userId=${userId}`);
+        const response = await axios.get(`/recipes?userId=${userId}`, {
+          headers: {
+            "ngrok-skip-browser-warning": "true",
+          },
+        });
+        console.log(response.data);
         setRecipes(response.data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
@@ -20,7 +25,11 @@ const MyRecipes = ({ userId }) => {
 
   const handleDeleteRecipe = async (recipeId) => {
     try {
-      await axios.delete(`/recipe/${recipeId}`);
+      await axios.delete(`/recipe/${recipeId}`, {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
+      });
       setRecipes(recipes.filter((recipe) => recipe.id !== recipeId));
     } catch (error) {
       console.error("Error deleting recipe:", error);
@@ -49,7 +58,7 @@ const MyRecipes = ({ userId }) => {
           </tr>
         </thead>
         <tbody>
-          {recipes.length > 0 ? (
+          {recipes && recipes.length > 0 ? (
             recipes.map((recipe) => (
               <tr key={recipe.id}>
                 <td>{recipe.name}</td>

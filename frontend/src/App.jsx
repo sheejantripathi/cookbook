@@ -29,7 +29,7 @@ const App = () => {
 
       const { token } = res.data;
       localStorage.setItem("jwtAccessToken", token);
-      setProfile(userData); // Set profile immediately after getting token
+      setProfile(res.data); // Set profile immediately after getting token
     } catch (error) {
       console.error("Error during login:", error);
     }
@@ -42,6 +42,7 @@ const App = () => {
         .get("/user", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
+            "ngrok-skip-browser-warning": "true",
           },
         })
         .then((res) => {
@@ -49,7 +50,6 @@ const App = () => {
         })
         .catch((err) => {
           console.error("Error fetching profile", err);
-          localStorage.removeItem("jwtAccessToken"); // Remove invalid token
         });
     }
   }, []);
@@ -69,7 +69,6 @@ const App = () => {
         )
         .then((res) => {
           saveUserInfo(res.data);
-          setProfile(res.data);
         })
         .catch((err) => console.log(err));
     }
