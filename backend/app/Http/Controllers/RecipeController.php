@@ -119,7 +119,7 @@ class RecipeController extends Controller
             // Handle file upload
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('images', 'public'); // Store file in 'storage/app/public/images' directory
-                $data['image'] = asset('storage/' . $imagePath); // Store the public URL of the uploaded file
+                $data['image'] = secure_asset('storage/' . $imagePath); // Store the public URL of the uploaded file
             }
 
             $recipe = Recipe::create($data);
