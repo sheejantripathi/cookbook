@@ -100,15 +100,12 @@ const RecipeForm = () => {
 
   const handleCreateIngredient = async (inputValue) => {
     try {
-      const response = await axios.post(
-        "/ingredient",
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
+      const response = await axios.post("/ingredient", {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
         },
-        { name: inputValue }
-      );
+        name: inputValue,
+      });
       const newOption = { value: response.data.id, label: response.data.name };
       setIngredientOptions((prevOptions) => [...prevOptions, newOption]);
       setSelectedIngredients((prevSelected) => [...prevSelected, newOption]);
@@ -119,15 +116,12 @@ const RecipeForm = () => {
 
   const handleCreateUtensil = async (inputValue) => {
     try {
-      const response = await axios.post(
-        "/utensil",
-        {
-          headers: {
-            "ngrok-skip-browser-warning": "true",
-          },
+      const response = await axios.post("/utensil", {
+        headers: {
+          "ngrok-skip-browser-warning": "true",
         },
-        { name: inputValue }
-      );
+        name: inputValue,
+      });
       const newOption = { value: response.data.id, label: response.data.name };
       setUtensilOptions((prevOptions) => [...prevOptions, newOption]);
       setSelectedUtensils((prevSelected) => [...prevSelected, newOption]);

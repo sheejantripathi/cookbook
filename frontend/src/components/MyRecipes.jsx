@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Table, Button } from "react-bootstrap";
-import { Link, Navigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "../axiosConfig"; // Assuming axiosConfig.js is correctly configured
 // eslint-disable-next-line react/prop-types
 const MyRecipes = ({ userId }) => {
   const [recipes, setRecipes] = useState([]);
-  console.log(userId);
+  const navigate = useNavigate();
+
+  // Fetch recipes for the user
   useEffect(() => {
     const fetchRecipes = async () => {
       try {
@@ -14,7 +16,6 @@ const MyRecipes = ({ userId }) => {
             "ngrok-skip-browser-warning": "true",
           },
         });
-        console.log(response.data);
         setRecipes(response.data);
       } catch (error) {
         console.error("Error fetching recipes:", error);
@@ -23,6 +24,7 @@ const MyRecipes = ({ userId }) => {
     fetchRecipes();
   }, [userId]);
 
+  // Delete recipe
   const handleDeleteRecipe = async (recipeId) => {
     try {
       await axios.delete(`/recipe/${recipeId}`, {
@@ -36,8 +38,9 @@ const MyRecipes = ({ userId }) => {
     }
   };
 
+  // Edit recipe
   const handleEdit = (recipeId) => {
-    Navigate(`/edit-recipe/${recipeId}`);
+    navigate(`/edit-recipe/${recipeId}`);
   };
 
   return (

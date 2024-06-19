@@ -8,6 +8,7 @@ import LoginPage from "./components/LoginPage";
 import CustomNavbar from "./components/Navbar";
 import MyRecipes from "./components/MyRecipes";
 import RecipeForm from "./components/RecipeForm";
+import RecipeDetail from "./components/RecipeDetail";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -98,6 +99,7 @@ const App = () => {
                 />
                 <Route path="/add-recipe" element={<RecipeForm />} />
                 <Route path="/edit-recipe/:id" element={<RecipeForm />} />
+                <Route path="/recipe/:id" element={<RecipeDetail />} />
               </Routes>
             </div>
           </>

@@ -8,6 +8,7 @@ import {
   Form,
   Button,
 } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import axios from "../axiosConfig"; // Assuming axiosConfig.js is correctly configured
 
 const Recipes = () => {
@@ -24,13 +25,6 @@ const Recipes = () => {
 
   const fetchRecipes = async (page, query) => {
     try {
-      // const response = await axios.get({
-      //   url: `https://55d1-89-205-227-35.ngrok-free.app/api/recipes/all?page=${1}&ingredient=${query}`,
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // });
       const response = await axios.get(
         `/recipes/all?page=${page}&ingredient=${query}`,
         {
@@ -39,7 +33,6 @@ const Recipes = () => {
           },
         }
       );
-      console.log("recipe data for the frontened", response);
       setRecipes(response.data.data);
       setCurrentPage(response.data.current_page);
       setLastPage(response.data.last_page);
@@ -72,9 +65,6 @@ const Recipes = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="mr-sm-2"
             />
-            <Button type="submit" variant="outline-success">
-              Search
-            </Button>
           </Form>
         </Col>
       </Row>
@@ -87,10 +77,14 @@ const Recipes = () => {
                   variant="top"
                   src={recipe.image || "default_image.jpg"}
                   alt={recipe.name}
+                  style={{ height: "200px", objectFit: "cover" }}
                 />
                 <Card.Body>
                   <Card.Title>{recipe.name}</Card.Title>
                 </Card.Body>
+                <Button as={Link} to={`/recipe/${recipe.id}`} variant="primary">
+                  View Recipe
+                </Button>
               </Card>
             </Col>
           ))}
