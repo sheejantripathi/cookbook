@@ -29,6 +29,10 @@ class AuthController extends Controller
             ]
         );
 
+        //revoke existing tokens
+        $user->tokens()->delete();
+
+        //Issue new token
         $token = $user->createToken('authToken')->plainTextToken;
 
         return response()->json(['token' => $token], 200);

@@ -84,7 +84,10 @@ const MyRecipes = ({ userId }) => {
                 <td>{recipe.utensils.join(", ")}</td>
                 <td>{recipe.steps.join(", ").substr(0, 100) + "..."}</td>
                 <td>
-                  <div className="d-flex justify-content-between">
+                  <div
+                    className="d-flex justify-content-between"
+                    style={{ width: "100px" }}
+                  >
                     <Button
                       variant="warning"
                       className="me-2"
