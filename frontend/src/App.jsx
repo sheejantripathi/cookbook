@@ -28,7 +28,6 @@ const App = () => {
         },
       })
       .then((res) => {
-        console.log("Profile fetched successfully", res.data);
         setProfile(res.data);
       })
       .catch((err) => {
@@ -36,19 +35,34 @@ const App = () => {
       });
   };
 
-  const saveUserInfo = async (userData) => {
+  const fetchGoogleProfileAndSaveUser = async (userData) => {
     try {
-      const res = await axios.post("/login", {
-        google_id: userData.id,
-        name: userData.name,
-        email: userData.email,
-        picture: userData.picture,
+      const res = await axios.get(
+        `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${userData.access_token}`,
+        {
+          headers: {
+            Authorization: `Bearer ${userData.access_token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      const profileData = res.data;
+
+      const loginResponse = await axios.post("/login", {
+        google_id: profileData.id,
+        name: profileData.name,
+        email: profileData.email,
+        picture: profileData.picture,
       });
 
-      const { token } = res.data;
+      const { token } = loginResponse.data;
       localStorage.setItem("jwtAccessToken", token);
+
+      // Fetch the user profile from your backend
+      getUserProfile();
     } catch (error) {
-      console.error("Error during login:", error);
+      console.error("Error during login or fetching profile:", error);
     }
   };
 
@@ -62,21 +76,7 @@ const App = () => {
   // Handle Google OAuth login and save user info
   useEffect(() => {
     if (user) {
-      axios
-        .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.access_token}`,
-              Accept: "application/json",
-            },
-          }
-        )
-        .then((res) => {
-          setProfile(res.data);
-          saveUserInfo(res.data);
-        })
-        .catch((err) => console.log(err));
+      fetchGoogleProfileAndSaveUser(user);
     }
   }, [user]);
 
@@ -115,4 +115,5 @@ const App = () => {
     </Router>
   );
 };
+
 export default App;

@@ -50,6 +50,10 @@ const Recipes = () => {
     fetchRecipes(1, searchQuery);
   };
 
+  if (!recipes) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <Container className="mt-4">
       <Row className="mb-4">

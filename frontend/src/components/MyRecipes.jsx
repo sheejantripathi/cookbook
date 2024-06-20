@@ -43,6 +43,10 @@ const MyRecipes = ({ userId }) => {
     navigate(`/edit-recipe/${recipeId}`);
   };
 
+  if (!recipes) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="container mt-5">
       <h2 className="mb-4">My Recipes</h2>

@@ -39,7 +39,6 @@ class RecipeController extends Controller
                  'utensils' => $recipe->utensils->pluck('name')->toArray(),
                  'user' => $recipe->user->id,
                  'steps' => $recipe->steps,
-                 // You can include other fields as needed
              ];
          });
  

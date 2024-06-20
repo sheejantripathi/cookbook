@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\UtensilController;
 use App\Http\Controllers\RecipeController;
@@ -9,6 +10,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->get('user', [AuthController::class, 'getUser']);
+
+//check later for fixing corb issue
+// Route::get('/images/{filename}', [ImageController::class, 'index']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     //ingredients api routes
@@ -25,7 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/recipe', [RecipeController::class, 'store']);
     Route::get('/recipe/{id}', [RecipeController::class, 'show']);
     Route::post('/recipe/{id}', [RecipeController::class, 'update']);
-    Route::delete('/recipe/{id}', [RecipeController::class, 'destroy']);
-    
+    Route::delete('/recipe/{id}', [RecipeController::class, 'destroy']);    
 });
 
