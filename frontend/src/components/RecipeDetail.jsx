@@ -67,7 +67,7 @@ const RecipeDetail = () => {
           </ListGroup>
         </Col>
       </Row>
-      <Row className="mt-4">
+      <Row className="mt-4 mb-4">
         <Col>
           <h3>Steps</h3>
           <ListGroup>
