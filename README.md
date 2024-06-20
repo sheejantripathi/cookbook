@@ -5,7 +5,7 @@ Welcome to the Cookbook Web Application! This is a full-stack web application bu
 ## Features
 
 - **User Authentication**: Secure login system using Google OAuth.
-- **Secure APIs: USed laravel sanctum to generate and validate access_token.
+- **Secure APIs**: USed laravel sanctum to generate and validate access_token.
 - **Recipe Listing**: Display all recipes posted by users on the homepage.
 - **Search Functionality**: Search recipes based on a specific ingredient.
 - **CRUD Operations**: 
@@ -31,3 +31,8 @@ Before you begin, ensure you have met the following requirements:
 - MySQL
 - Git
 - Ngrok (for local tunneling)
+
+### Access
+
+You can access the application through this ngrok link for now: [CookBook of Champions](https://a31d-89-205-227-35.ngrok-free.app/)
+
