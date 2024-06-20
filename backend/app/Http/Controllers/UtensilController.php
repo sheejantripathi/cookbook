@@ -16,7 +16,9 @@ class UtensilController extends Controller
     public function store(Request $request)
     {
         $request->validate(['name' => 'required|unique:utensils']);
-        $utensil = Utensil::create($request->only('name'));
+        $utensil = Utensil::create([
+            'name' => strtolower(($request->input('name')))
+        ]);
         return response()->json($utensil, 201);
     }
 }

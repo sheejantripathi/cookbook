@@ -1,5 +1,5 @@
 import axios from "axios";
-axios.defaults.baseURL = "https://db04-89-205-227-35.ngrok-free.app/api";
+axios.defaults.baseURL = "https://2efc-89-205-227-35.ngrok-free.app/api";
 
 axios.interceptors.request.use(
   (config) => {

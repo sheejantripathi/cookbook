@@ -20,7 +20,9 @@ class IngredientController extends Controller
     public function store(Request $request)
     {
         $request->validate(['name' => 'required|unique:ingredients']);
-        $ingredient = Ingredient::create($request->only('name'));
+        $ingredient = Ingredient::create([
+            'name' => strtolower(($request->input('name')))
+        ]);
         return response()->json($ingredient, 201);
     }
 }

@@ -19,6 +19,23 @@ const App = () => {
     onError: (error) => console.log("Login Failed:", error),
   });
 
+  const getUserProfile = async () => {
+    axios
+      .get("/user", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
+          "ngrok-skip-browser-warning": "true",
+        },
+      })
+      .then((res) => {
+        console.log("Profile fetched successfully", res.data);
+        setProfile(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching profile", err);
+      });
+  };
+
   const saveUserInfo = async (userData) => {
     try {
       const res = await axios.post("/login", {
@@ -30,7 +47,6 @@ const App = () => {
 
       const { token } = res.data;
       localStorage.setItem("jwtAccessToken", token);
-      setProfile(res.data); // Set profile immediately after getting token
     } catch (error) {
       console.error("Error during login:", error);
     }
@@ -39,19 +55,7 @@ const App = () => {
   // Check for JWT token in localStorage on app load (page refresh)
   useEffect(() => {
     if (localStorage.getItem("jwtAccessToken")) {
-      axios
-        .get("/user", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtAccessToken")}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        })
-        .then((res) => {
-          setProfile(res.data);
-        })
-        .catch((err) => {
-          console.error("Error fetching profile", err);
-        });
+      getUserProfile();
     }
   }, []);
 
@@ -69,6 +73,7 @@ const App = () => {
           }
         )
         .then((res) => {
+          setProfile(res.data);
           saveUserInfo(res.data);
         })
         .catch((err) => console.log(err));

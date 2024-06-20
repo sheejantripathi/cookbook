@@ -191,13 +191,11 @@ class RecipeController extends Controller
     // Update basic fields
     $data = $request->all();
     $data['user_id'] = Auth::id();
-  
-    Log::info($data);
-    
+      
      // Handle image upload if a new image is provided
      if ($request->hasFile('image')) {
         $imagePath = $request->file('image')->store('images', 'public'); // Store file in 'storage/app/public/images' directory
-        $data['image'] = asset('storage/' . $imagePath); // Store the public URL of the uploaded file
+        $data['image'] = secure_asset('storage/' . $imagePath); // Store the public URL of the uploaded file
     }else{
         $recipe->image = $request->input('imageString');
     }
