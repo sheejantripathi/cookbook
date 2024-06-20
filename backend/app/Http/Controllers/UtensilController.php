@@ -10,12 +10,16 @@ class UtensilController extends Controller
 {
     public function index()
     {
+        // Get all utensils
         return Utensil::all();
     }
 
     public function store(Request $request)
     {
+        // Validate the request
         $request->validate(['name' => 'required|unique:utensils']);
+
+        // Create a new utensil
         $utensil = Utensil::create([
             'name' => strtolower(($request->input('name')))
         ]);

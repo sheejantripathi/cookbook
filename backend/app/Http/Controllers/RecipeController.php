@@ -64,7 +64,7 @@ class RecipeController extends Controller
         // Filter by ingredients if needed or provided in the query
         if ($ingredient) {
             $query->whereHas('ingredients', function($q) use ($ingredient) {
-                $q->where('name', 'like', '%' . $ingredient . '%');
+                $q->where('name', '=', $ingredient);
             });
         }
 
@@ -147,8 +147,10 @@ class RecipeController extends Controller
      */
     public function show(string $id)
     {
+        // Get the recipe with the provided id
         $recipe = Recipe::with(['ingredients', 'utensils'])->find($id);
 
+        // If the recipe is not found, return a 404 response
         if(!$recipe) {
             return response()->json(['message' => 'Recipe not found'], 404);
         }
@@ -156,19 +158,13 @@ class RecipeController extends Controller
         return response()->json($recipe);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
+    
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
 {
+    // Get the recipe with the provided id
     $recipe = Recipe::find($id);
     if (!$recipe) {
         return response()->json(['error' => 'Recipe not found'], 404);
@@ -220,14 +216,16 @@ class RecipeController extends Controller
      */
     public function destroy(string $id)
     {
+        // Get the recipe with the provided id
         $recipe = Recipe::find($id);
 
-    if (!$recipe) {
-        return response()->json(['error' => 'Recipe not found'], 404);
-    }
+        if (!$recipe) {
+            return response()->json(['error' => 'Recipe not found'], 404);
+        }
 
-    $recipe->delete();
+        // Delete the recipe
+        $recipe->delete();
 
-    return response()->json(['message' => 'Recipe deleted successfully']);
+        return response()->json(['message' => 'Recipe deleted successfully']);
     }
 }

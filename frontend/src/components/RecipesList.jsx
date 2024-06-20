@@ -18,11 +18,6 @@ const Recipes = () => {
   const [lastPage, setLastPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
 
-  //useEffect to fetch the set of initial recipes list from the server
-  useEffect(() => {
-    fetchRecipes(currentPage, searchQuery);
-  }, [currentPage, searchQuery]);
-
   const fetchRecipes = async (page, query) => {
     try {
       const response = await axios.get(
@@ -40,6 +35,11 @@ const Recipes = () => {
       console.error("Error fetching recipes:", error);
     }
   };
+
+  //useEffect to fetch the set of initial recipes list from the server
+  useEffect(() => {
+    fetchRecipes(currentPage, searchQuery);
+  }, [currentPage, searchQuery]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);

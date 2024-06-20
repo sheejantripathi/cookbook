@@ -19,3 +19,11 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+<FilesMatch "\.(jpg|jpeg)$">
+    Header set Content-Type "image/jpeg"
+</FilesMatch>
+
+<FilesMatch "\.png$">
+    Header set Content-Type "image/png"
+</FilesMatch>
