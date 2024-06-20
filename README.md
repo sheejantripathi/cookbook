@@ -5,7 +5,8 @@ Welcome to the Cookbook Web Application! This is a full-stack web application bu
 ## Features
 
 - **User Authentication**: Secure login system using Google OAuth.
-- **Secure APIs**: USed laravel sanctum to generate and validate access_token.
+- **Secure APIs**: Used laravel sanctum to generate and validate access_token.
+- **Pagination**: Pagination based on the limit provided(currently static for 8 recipes for a page)
 - **Recipe Listing**: Display all recipes posted by users on the homepage.
 - **Search Functionality**: Search recipes based on a specific ingredient.
 - **CRUD Operations**: 
