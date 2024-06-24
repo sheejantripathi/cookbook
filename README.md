@@ -35,5 +35,5 @@ Before you begin, ensure you have met the following requirements:
 
 ### Access
 
-You can access the application through this ngrok link for now: [CookBook of Champions](https://a31d-89-205-227-35.ngrok-free.app/)
+You can access the application through this ngrok link for now: [CookBook of Champions](https://3fc8-84-241-199-51.ngrok-free.app/)
 
